@@ -2,7 +2,7 @@
 return [
     'host'  =>  "10.1.1.239\SQLEXPRESS",
     'port'  =>  "56404",
-    'name'  =>  "SAGE",
+    'name'  =>  "SIGEPAG",
     'user'  =>  "dev",
     'pass'  =>  "phrh@5020",
     'type'  =>  "sql",
