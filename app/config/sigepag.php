@@ -5,6 +5,6 @@ return [
     'name'  =>  "SIGEPAG",
     'user'  =>  "dev",
     'pass'  =>  "phrh@5020",
-    'type'  =>  "sql",
+    'type'  =>  "sqlsrv",
     'prep'  =>  "1"
 ];
