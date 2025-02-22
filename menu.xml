@@ -44,6 +44,12 @@
               </menuitem>
         </menu>
     </menuitem>
+    <menu>
+        <menuitem label='Consulta'>
+            <icon>fas:search fa-fw</icon>
+            <action>BuscaPessoal</action>
+        </menuitem>
+    </menu>
     
     <menuitem label='Logs'>
         <icon>fas:desktop fa-fw</icon>

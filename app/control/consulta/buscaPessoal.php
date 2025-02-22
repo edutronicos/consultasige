@@ -8,7 +8,7 @@ use Adianti\Widget\Datagrid\TDataGridColumn;
 use Adianti\Widget\Util\TXMLBreadCrumb;
 use Adianti\Wrapper\BootstrapDatagridWrapper;
 
-class buscaPessoal extends TPage
+class BuscaPessoal extends TPage
 {
     private $datagrid;
 
@@ -20,7 +20,7 @@ class buscaPessoal extends TPage
         $this->setDatabase('sigepag');
         $this->setActiveRecord('Pessoal');
         $this->setDefaultOrder('Pessoal_Codigo', 'asc');
-        
+
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
 
         $pessoal_codigo = new TDataGridColumn('Pessoal_Codigo', 'Código', 'center', '10%');
