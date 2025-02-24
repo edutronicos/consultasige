@@ -1,5 +1,5 @@
 /lib
 /vendor
-/app/config/consultasiege.php
+/app/config/consultasige.php
 /app/config/log.php
 /app/config/permission.php
