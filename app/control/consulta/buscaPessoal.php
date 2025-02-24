@@ -3,8 +3,10 @@
 use Adianti\Control\TAction;
 use Adianti\Control\TPage;
 use Adianti\Database\TCriteria;
+use Adianti\Database\TFilter;
 use Adianti\Database\TRepository;
 use Adianti\Database\TTransaction;
+use Adianti\Widget\Container\THBox;
 use Adianti\Widget\Container\TPanelGroup;
 use Adianti\Widget\Container\TVBox;
 use Adianti\Widget\Datagrid\TDataGrid;
@@ -12,12 +14,15 @@ use Adianti\Widget\Datagrid\TDataGridAction;
 use Adianti\Widget\Datagrid\TDataGridColumn;
 use Adianti\Widget\Datagrid\TPageNavigation;
 use Adianti\Widget\Dialog\TMessage;
+use Adianti\Widget\Form\TButton;
 use Adianti\Widget\Form\TEntry;
+use Adianti\Widget\Form\TForm;
 use Adianti\Widget\Util\TXMLBreadCrumb;
 use Adianti\Wrapper\BootstrapDatagridWrapper;
 
 class BuscaPessoal extends TPage
 {
+    private $form;
     private $datagrid;
     private $navigation;
 
@@ -29,7 +34,35 @@ class BuscaPessoal extends TPage
         $this->setDatabase('sigepag');
         $this->setActiveRecord('Pessoal');
         $this->setDefaultOrder('Pessoal_Codigo', 'asc');
+        $this->addFilterField('Pessoal_Nome', 'like', 'Pessoal_Nome');
+        $this->addFilterField('Pessoal_CPF', 'like', 'Pessoal_CPF');
         $this->setLimit(10);
+
+        $this->form = new TForm('form_busca_pessoal');
+
+        $box = new THBox;
+        $this->form->add($box);
+
+        $campo_busca = new TEntry('c_busca');
+        $campo_busca->setSize('100%');
+        $campo_busca->placeholder = 'Nome ou CPF';
+
+        $botao_busca = new TButton('busca');
+        $acao_busca = new TAction([$this, 'onSearch']);
+        $botao_busca->setAction($acao_busca, 'Buscar');
+        $botao_busca->setImage('fa:search blue');
+
+        $botao_limpar = new TButton('limpar');
+        $acao_limpar = new TAction([$this, 'clear']);
+        $botao_limpar->setAction($acao_limpar, 'Limpar');
+        $botao_limpar->setImage('fa:eraser red');
+
+        $box->add($campo_busca)->style = 'width: calc(100% - 170px); float:left; text-align:center';
+        $box->add($botao_busca)->style = 'width: 80px; float:left; text-align:center';
+        $box->add($botao_limpar)->style = 'width: 80px; float:left; text-align:center';
+
+        $this->form->setFields([$campo_busca, $botao_busca, $botao_limpar]);
+
 
         $this->datagrid = new BootstrapDatagridWrapper(new TDataGrid);
         $this->datagrid->width = '100%';
@@ -52,73 +85,48 @@ class BuscaPessoal extends TPage
 
         $this->datagrid->createModel();
 
-        $busca = new TEntry('busca');
-        $busca->placeholder = 'Nome ou CPF';
-        $busca->setSize('100%');
-        $this->datagrid->enableSearch($busca, 'Pessoal_Nome, Pessoal_CPF');  
+        // $busca = new TEntry('busca');
+        // $busca->placeholder = 'Nome ou CPF';
+        // $busca->setSize('100%');
+        // $this->datagrid->enableSearch($busca, 'Pessoal_Nome, Pessoal_CPF');  
 
         $this->navigation = new TPageNavigation;
         $this->navigation->setAction(new TAction([$this, 'onReload']));
         $this->navigation->enableCounters();
 
-        $panel = new TPanelGroup('Busca de Pessoal');
-        $panel->addHeaderWidget($busca);
-        $panel->add($this->datagrid)->style = 'overflow-x:auto';
-        $panel->addFooter($this->navigation);
-
         $vbox = new TVBox;
         $vbox->style = 'width: 100%';
+        $vbox->add(TPanelGroup::pack($this->form, $this->datagrid, $this->navigation));
         $vbox->add(new TXMLBreadCrumb('menu.xml', __CLASS__));
-        $vbox->add($panel);
 
         parent::add($vbox);
     }
 
-    public function onReload($param = null)
+    function clear()
     {
-        try
-        {
+        $this->form->clear();
+        $this->onReload();
+    }
+
+    function onSearch($param)
+    {
+        try {
             TTransaction::open('sigepag');
-
             $repository = new TRepository('Pessoal');
-
-            $limit = 10;
-
-            //$offset = $this->datagrid->getOffset();
-
             $criteria = new TCriteria;
-            $criteria->setProperties($param);
-            $criteria->setProperty('limit', $limit);
-            //$criteria->setProperty('offset', $offset);
-            $criteria->setProperty('order', $this->order);
 
-            $objects = $repository->load($criteria, FALSE);
-
-            $this->datagrid->clear();
-
-            if ($objects)
-            {
-                foreach ($objects as $object)
-                {
-                    $this->datagrid->addItem($object);
-                }
+            if (!empty($param['c_busca'])) {
+                $criteria->add(new TFilter('Pessoal_Nome', 'like', '%' . $param['c_busca'] . '%'));
+                $criteria->add(new TFilter('Pessoal_CPF', 'like', '%' . $param['c_busca'] . '%'), 'OR ');
             }
 
-            $criteria->resetProperties();
-
-            $count = $repository->count($criteria);
-
-            $this->navigation->setCount($count);
-            $this->navigation->setProperties($param);
-
+            $this->setCriteria($criteria);
+            $this->onReload();
             TTransaction::close();
-
-            $this->loaded = TRUE;
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             new TMessage('error', $e->getMessage());
-            TTransaction::rollback();
         }
     }
+
+    
 }
