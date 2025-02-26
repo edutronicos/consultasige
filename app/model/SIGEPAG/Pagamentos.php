@@ -87,4 +87,13 @@ class Pagamentos extends TRecord
         }
         return $resultado;
     }
+    
+    public function get_lote_empresaContaCodigo()
+    {
+        if (empty($this->lote_codigo))
+        {
+            $this->lote_codigo = new Lote($this->Lote_Codigo);
+        }
+        return $this->lote_codigo->EmpresaConta_Codigo;
+    }
 }

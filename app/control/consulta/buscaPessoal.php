@@ -36,7 +36,7 @@ class BuscaPessoal extends TPage
         $this->setDefaultOrder('Pessoal_Codigo', 'asc');
         $this->addFilterField('Pessoal_Nome', 'like', 'Pessoal_Nome');
         $this->addFilterField('Pessoal_CPF', 'like', 'Pessoal_CPF');
-        $this->setLimit(10);
+        $this->setLimit(50);
 
         $this->form = new TForm('form_busca_pessoal');
 
@@ -69,7 +69,6 @@ class BuscaPessoal extends TPage
 
         $pessoal_codigo = new TDataGridColumn('Pessoal_Codigo', 'Código', 'center', '10%');
         $pessoal_nome = new TDataGridColumn('Pessoal_Nome', 'Nome', 'left', '60%');
-        //$banco
         $agencia = new TDataGridColumn('Pessoal_Agencia', 'Agência', 'center', '10%');
         $conta = new TDataGridColumn('Pessoal_Conta', 'Conta', 'center', '10%');
         $cpf = new TDataGridColumn('Pessoal_CPF', 'CPF', 'center', '10%');
@@ -90,9 +89,11 @@ class BuscaPessoal extends TPage
         // $busca->setSize('100%');
         // $this->datagrid->enableSearch($busca, 'Pessoal_Nome, Pessoal_CPF');  
 
+
         $this->navigation = new TPageNavigation;
-        $this->navigation->setAction(new TAction([$this, 'onReload']));
         $this->navigation->enableCounters();
+        $this->navigation->setAction(new TAction([$this, 'onReload']));
+        $this->navigation->setWidth($this->datagrid->getWidth());
 
         $vbox = new TVBox;
         $vbox->style = 'width: 100%';
@@ -110,10 +111,12 @@ class BuscaPessoal extends TPage
 
     function onSearch($param)
     {
+        $this->form->setData((object) $param);
         try {
             TTransaction::open('sigepag');
             $repository = new TRepository('Pessoal');
             $criteria = new TCriteria;
+            $criteria->setProperties($param);
 
             if (!empty($param['c_busca'])) {
                 $criteria->add(new TFilter('Pessoal_Nome', 'like', '%' . $param['c_busca'] . '%'));
@@ -121,7 +124,58 @@ class BuscaPessoal extends TPage
             }
 
             $this->setCriteria($criteria);
-            $this->onReload();
+
+
+            $this->onReload($param);
+            TTransaction::close();
+        } catch (Exception $e) {
+            new TMessage('error', $e->getMessage());
+        }
+    }
+
+    function onReload($param = null)
+    {
+        $this->form->setData((object) $param);
+        try {
+            TTransaction::open('sigepag');
+            $repository = new TRepository('Pessoal');
+            $limit = 10;
+            $criteria = new TCriteria;
+            $criteria->setProperty('limit', $limit);
+            $criteria->setProperties($param);
+
+            if (!empty($param['c_busca'])) {
+                $criteria->add(new TFilter('Pessoal_Nome', 'like', '%' . $param['c_busca'] . '%'));
+                $criteria->add(new TFilter('Pessoal_CPF', 'like', '%' . $param['c_busca'] . '%'), 'OR ');
+            }
+
+            $this->setCriteria($criteria);
+
+            $objects = $repository->load($criteria);
+            $this->datagrid->clear();
+            if ($objects) {
+                foreach ($objects as $object) {
+                    $this->datagrid->addItem($object);
+                }
+            }
+            $count_criteria = clone $criteria;
+            $count_criteria->resetProperties(); // Remove limit, order, etc
+            $conn = TTransaction::get();
+            $sql = "SELECT COUNT(1) FROM Pessoal";
+            if (!$count_criteria->isEmpty()) {
+                $sql .= ' WHERE ' . $count_criteria->dump();
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($count_criteria->getPreparedVars());
+            $totalRecords = $stmt->fetchColumn();
+
+            $this->navigation->setCount($totalRecords);
+            $this->navigation->setProperties($param);
+            $action_p = new TDataGridAction([$this, 'onReload']);
+            $action_p->setParameters($param);
+            $this->navigation->setAction($action_p);
+            //$this->navigation->setAction(new TAction([$this, 'onReload']));
+
             TTransaction::close();
         } catch (Exception $e) {
             new TMessage('error', $e->getMessage());
