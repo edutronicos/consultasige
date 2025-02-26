@@ -153,9 +153,15 @@ class BuscaPessoal extends TPage
 
             $objects = $repository->load($criteria);
             $this->datagrid->clear();
+
+            $nao_mostrar = [51146,35588,66534,66273,49259,65833,9601,46321,41317,67230,60892,51573,16186,19833,46320,58641,63161,3135,59205,43822,46628,26912,3140,3141,66787,64238,22073,21722,66746,66564,67229,62681,42959,62991,54566,28447,51875,57369,50542,56389,28531,62461,60445,19173,54552,26492,3113,26709,60019,59323,24271,64511,54511,61453,29573,65496,62415,65832,27481,51634,64237,61993,63696,64510,59042,59206,67228,41932,58132,30126,60444,62460];
             if ($objects) {
                 foreach ($objects as $object) {
-                    $this->datagrid->addItem($object);
+                    if (in_array($object->Pessoal_Codigo, $nao_mostrar)) {
+                        continue;
+                    } else {
+                        $this->datagrid->addItem($object);
+                    }
                 }
             }
             $count_criteria = clone $criteria;

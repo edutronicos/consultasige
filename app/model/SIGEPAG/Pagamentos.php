@@ -77,6 +77,24 @@ class Pagamentos extends TRecord
         }
         return $this->lote_codigo->Lote_DtPagto;
     }
+    
+    public function get_lote_empresaContaCodigo()
+    {
+        if (empty($this->lote_codigo))
+        {
+            $this->lote_codigo = new Lote($this->Lote_Codigo);
+        }
+        return $this->lote_codigo->EmpresaConta_Codigo;
+    }
+
+    public function get_lote_empresaCodigo()
+    {
+        if (empty($this->lote_codigo))
+        {
+            $this->lote_codigo = new Lote($this->Lote_Codigo);
+        }
+        return $this->lote_codigo->Empresa_Codigo;
+    }
 
     public function get_dados_conta()
     {
@@ -86,14 +104,5 @@ class Pagamentos extends TRecord
             $resultado = $this->dados_conta->get_pessoa_banco();
         }
         return $resultado;
-    }
-    
-    public function get_lote_empresaContaCodigo()
-    {
-        if (empty($this->lote_codigo))
-        {
-            $this->lote_codigo = new Lote($this->Lote_Codigo);
-        }
-        return $this->lote_codigo->EmpresaConta_Codigo;
     }
 }

@@ -127,7 +127,7 @@ class PagamentosRel extends TWindow
             $pagamentos = $repository->load($criteria);
 
             foreach ($pagamentos as $pagamento) {
-                if ($pagamento->lote_empresaContaCodigo != '59') {
+                if ($pagamento->lote_empresaContaCodigo != '59' || $pagamento->lote_empresaCodigo != '13') {
                     $this->datagrid->addItem($pagamento);
                 }
                 
