@@ -1,4 +1,8 @@
-AuthUserFile /root/.htpasswd
-AuthType Basic
-AuthName "restricted area"
-require valid-user
+# AuthUserFile /root/.htpasswd
+# AuthType Basic
+# AuthName "restricted area"
+# require valid-user
+<FilesMatch "\.(pdf)$">
+    Satisfy Any
+    Allow from all
+</FilesMatch>
