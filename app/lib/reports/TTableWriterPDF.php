@@ -18,7 +18,7 @@ class TTableWriterPDF implements ITableWriter
      * Constructor
      * @param $widths Array with column widths
      */
-    public function __construct($widths, $orientation='P', $format = 'A4')
+    public function __construct($widths, $orientation='P', $format = 'A4', $marginLeft = 15, $marginTop = 30, $marginRight = 13)
     {
         $this->widths = $widths;
         $this->styles = array();
@@ -30,7 +30,7 @@ class TTableWriterPDF implements ITableWriter
                   'LEGAL' => [612,1008]];
         
         $total_width = array_sum($this->widths);
-        $page_width = ($orientation == 'P' ? $sizes[strtoupper($format)][0] : $sizes[strtoupper($format)][1]) -50;
+        $page_width = ($orientation == 'P' ? $sizes[strtoupper($format)][0] : $sizes[strtoupper($format)][1]) - ($marginLeft + $marginRight);
         
         if ($total_width > $page_width)
         {
@@ -44,6 +44,7 @@ class TTableWriterPDF implements ITableWriter
         setlocale(LC_ALL, 'POSIX');
         // cria o objeto FPDF
         $this->pdf = new FPDF($orientation, 'pt', $format);
+        $this->pdf->SetMargins($marginLeft, $marginTop, $marginRight);
         $this->pdf->Open();
         $this->pdf->AddPage();
     }

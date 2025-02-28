@@ -42,8 +42,8 @@ class PagamentosRel extends TWindow
 
         $remessa = new TDataGridColumn('lote_dtremessa', 'Remessa', 'center', '5%');
         $pagamento = new TDataGridColumn('lote_dtpagamento', 'Pagamento', 'center', '5%');
-        $periodo_ini = new TDataGridColumn('Pagamentos_PeriodoIni', 'Período Inicial', 'center', '5%');
-        $periodo_fin = new TDataGridColumn('Pagamentos_PeriodoFin', 'Período Final', 'center', '5%');
+        $periodo_ini = new TDataGridColumn('Pagamentos_PeriodoIni', 'Período Ini', 'center', '5%');
+        $periodo_fin = new TDataGridColumn('Pagamentos_PeriodoFin', 'Período Fin', 'center', '5%');
         $valor = new TDataGridColumn('Pagamentos_Valor', 'Valor', 'left', '5%');
         $verba = new TDataGridColumn('verba_descricao', 'Verba', 'left', '10%');
         $ccorrente_codigo = new TDataGridColumn('dados_conta', 'Conta Corrente', 'center', '20%');
@@ -164,12 +164,12 @@ class PagamentosRel extends TWindow
 
             $headerRow = array_shift($items);
     
-            $widths = [70, 70, 80, 300, 180, 90, 90]; // Ajuste conforme sua necessidade
-            $pdf    = new TTableWriterPDF($widths, 'L', 'A3');
+            $widths = [50, 50, 60, 180, 120, 50, 50]; // Ajuste conforme sua necessidade
+            $pdf    = new TTableWriterPDF($widths, 'P', 'A4');
 
             // Cria alguns estilos simples
-            $pdf->addStyle('title', 'Arial', '10', 'B', '#ffffff', '#7C8EA9');
-            $pdf->addStyle('datap', 'Arial', '10', '',  '#000000', '#ffffff');
+            $pdf->addStyle('title', 'Arial', '8', 'B', '#ffffff', '#7C8EA9');
+            $pdf->addStyle('datap', 'Arial', '8', '',  '#000000', '#ffffff');
             $pdf->addStyle('header', 'Arial', '14', 'B', '#000000', '#DCDCDC');
 
             // Cabeçalho
