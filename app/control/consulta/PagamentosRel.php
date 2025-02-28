@@ -147,7 +147,15 @@ class PagamentosRel extends TWindow
     
             // Agora sim o datagrid tem todos os itens
             $items = $this->datagrid->getOutputData();
+            $p_codigo = TSession::getValue('pessoal_codigo');
+            
+            TTransaction::open('sigepag');
+            $pessoa = new Pessoal($p_codigo);
+            $pessoal_nome = $pessoa->Pessoal_Nome;
+            TTransaction::close();
+
             TSession::delValue('pessoal_codigo');
+
             if (!$items)
             {
                 new TMessage('info', 'Não há dados para exportar');
@@ -162,8 +170,11 @@ class PagamentosRel extends TWindow
             // Cria alguns estilos simples
             $pdf->addStyle('title', 'Arial', '10', 'B', '#ffffff', '#7C8EA9');
             $pdf->addStyle('datap', 'Arial', '10', '',  '#000000', '#ffffff');
+            $pdf->addStyle('header', 'Arial', '14', 'B', '#000000', '#DCDCDC');
 
             // Cabeçalho
+            $pdf->addRow();
+            $pdf->addCell($pessoal_nome, 'center', 'header', count($headerRow));
             $pdf->addRow();
             foreach ($headerRow as $titleCell) {
                 $pdf->addCell($titleCell, 'center', 'title');
